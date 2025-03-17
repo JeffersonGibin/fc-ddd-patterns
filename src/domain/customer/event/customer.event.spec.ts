@@ -36,4 +36,23 @@ describe('Customer events - test', () => {
           expect(logSpy).toBeCalledWith("Esse é o segundo console.log do evento: CustomerCreated");
         });
     });
+
+    describe('AddressChanged', () => {
+        it('should fire event when customers address is changed', () => {
+            const logSpy = jest.spyOn(console, "log");
+
+            const eventData = {
+                id: 979797,
+                name: "Jeff Bezos",
+                address: new Address("St. Two", 99, "999-22", "City")
+            };
+
+            eventDispatcher.register("CustomerAddressChangedEvent", new LogWhenCustomersAddressIsChanged());
+            const addressChangedEvent = new CustomerAddressChangedEvent(eventData);
+        
+            eventDispatcher.notify(addressChangedEvent);
+        
+            expect(logSpy).toBeCalledWith("Endereço do cliente: 979797, Jeff Bezos alterado para: St. Two, 99, 999-22 City");
+        });
+    });
 });
