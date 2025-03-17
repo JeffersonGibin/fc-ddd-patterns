@@ -1,3 +1,6 @@
+import EventDispatcher from "../../@shared/event/event-dispatcher";
+import CustomerAddressChangedEvent from "../event/customer-address-changed.event";
+import CustomerCreatedEvent from "../event/customer-created.event";
 import Address from "../value-object/address";
 
 export default class Customer {
@@ -43,8 +46,18 @@ export default class Customer {
     return this._address;
   }
   
-  changeAddress(address: Address) {
+  changeAddress(address: Address, eventDispatcher?: EventDispatcher) {
     this._address = address;
+
+    if (eventDispatcher) {
+      const customerAddressChangedEvent = new CustomerAddressChangedEvent({
+        id: this._id,
+        name: this._name,
+        address: this._address
+      });
+
+      eventDispatcher.notify(customerAddressChangedEvent)
+    }
   }
 
   isActive(): boolean {
@@ -68,5 +81,15 @@ export default class Customer {
 
   set Address(address: Address) {
     this._address = address;
+  }
+
+  static create(id: string, name: string, eventDispatcher?: EventDispatcher) {
+    const customer = new Customer(id, name);
+
+    if (eventDispatcher) {
+      eventDispatcher.notify(new CustomerCreatedEvent(customer));
+    }
+
+    return customer
   }
 }
